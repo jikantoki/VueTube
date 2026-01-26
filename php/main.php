@@ -1,6 +1,5 @@
 <?php
 // --- 1. CORS設定（ここを先頭に追加） ---
-header("Access-Control-Allow-Origin: http://localhost:3000");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
 // カスタムヘッダー（ID, PASSWORD）の通信を許可する
 header("Access-Control-Allow-Headers: Content-Type, ID, PASSWORD, X-Requested-With");
@@ -20,7 +19,7 @@ if (!isset($_SERVER['HTTP_ID']) || !isset($_SERVER['HTTP_PASSWORD'])) {
 $id = $_SERVER['HTTP_ID'];
 $password = $_SERVER['HTTP_PASSWORD'];
 
-require_once __DIR__ . '/usrelist.php';
+require_once __DIR__ . '/userlist.php';
 
 $isAuthenticated = false;
 // IDとパスワードの確認
