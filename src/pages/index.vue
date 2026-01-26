@@ -34,6 +34,14 @@
           label="順序"
           style="max-width: 200px;"
         )
+      .center(
+        style="text-align: center;"
+      )
+        v-btn(
+          append-icon="mdi-refresh"
+          style="background-color: rgb(var(--v-theme-primary)); color: white;"
+          @click="getData(true)"
+        ) 最新データを取得
       h2.ma-16(
         style="text-align: center;"
         v-if="searchResults.length === 0"
@@ -111,6 +119,22 @@
           @click="errorDialog = false"
           style="background-color: rgb(var(--v-theme-primary)); color: white;"
         ) 閉じる
+  v-dialog(
+    v-model="refreshDialog"
+    max-width="500"
+  )
+    v-card
+      v-card-title データを更新しました
+      v-card-text(
+        style="text-align: center;"
+        )
+          p 見つかったファイル数: {{ searchResults.length }}個
+      v-card-actions
+        v-spacer
+        v-btn(
+          @click="refreshDialog = false"
+          style="background-color: rgb(var(--v-theme-primary)); color: white;"
+        ) 閉じる
 </template>
 
 <script lang="ts">
@@ -150,6 +174,7 @@
           '↓',
         ],
         selectedAscDesc: '↑',
+        refreshDialog: false,
       }
     },
     watch: {
@@ -217,42 +242,7 @@
         this.store.files = JSON.parse(files)
         this.searchResults = this.store.files
       }
-
-      try {
-        const response = await fetch(`${this.store.server}/main.php`, {
-          method: 'POST',
-          headers: {
-            id: this.store.userId,
-            password: this.store.password,
-          },
-        })
-        if (response.status !== 200) {
-          throw new Error(`HTTPステータス${response.status}: ログインに失敗しました。IDまたはパスワードを確認してください。サーバーが圏外の可能性もあります`)
-        }
-        const data: ResponseData = await response.json()
-
-        // ログイン成功したので情報を保存
-        localStorage.setItem('userId', this.store.userId)
-        localStorage.setItem('password', this.store.password)
-        if (data.files) {
-          this.store.files = data.files
-          localStorage.setItem('files', JSON.stringify(this.store.files))
-          // this.searchResults = this.store.files
-        }
-        if (data.ip) {
-          this.store.ipAddress = data.ip
-        }
-        if (data.totalBytes) {
-          this.store.totalBytes = data.totalBytes
-        }
-        if (data.freeBytes) {
-          this.store.freeBytes = data.freeBytes
-        }
-      } catch (error) {
-        this.errorDialog = true
-        this.errorMessage = (error as Error).message
-        console.error(error)
-      }
+      await this.getData()
     },
     methods: {
       copy (text: string) {
@@ -290,7 +280,48 @@
           }
           return asc ? compare : -compare
         })
-      } },
+      },
+      async getData (showDialog = false) {
+        try {
+          const response = await fetch(`${this.store.server}/main.php`, {
+            method: 'POST',
+            headers: {
+              id: this.store.userId,
+              password: this.store.password,
+            },
+          })
+          if (response.status !== 200) {
+            throw new Error(`HTTPステータス${response.status}: ログインに失敗しました。IDまたはパスワードを確認してください。サーバーが圏外の可能性もあります`)
+          }
+          const data: ResponseData = await response.json()
+
+          // ログイン成功したので情報を保存
+          localStorage.setItem('userId', this.store.userId)
+          localStorage.setItem('password', this.store.password)
+          if (data.files) {
+            this.store.files = data.files
+            localStorage.setItem('files', JSON.stringify(this.store.files))
+            // this.searchResults = this.store.files
+          }
+          if (data.ip) {
+            this.store.ipAddress = data.ip
+          }
+          if (data.totalBytes) {
+            this.store.totalBytes = data.totalBytes
+          }
+          if (data.freeBytes) {
+            this.store.freeBytes = data.freeBytes
+          }
+          if (showDialog) {
+            this.refreshDialog = true
+          }
+        } catch (error) {
+          this.errorDialog = true
+          this.errorMessage = (error as Error).message
+          console.error(error)
+        }
+      },
+    },
   }
 </script>
 

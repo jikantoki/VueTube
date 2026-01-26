@@ -124,6 +124,7 @@
 </template>
 
 <script lang="ts">
+  import { App } from '@capacitor/app'
   import { useStore } from './stores/store'
   export default {
     name: 'App',
@@ -160,6 +161,14 @@
     },
     mounted () {
       document.title = 'VueTube'
+      App.addListener('backButton', () => {
+        // ここにバックボタンが押されたときの処理を記述
+        if (this.$router.currentRoute.value.path === '/') {
+          App.minimizeApp()
+        } else {
+          this.$router.back()
+        }
+      })
     },
     methods: {
       logout () {
