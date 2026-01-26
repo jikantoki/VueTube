@@ -1,7 +1,7 @@
 <template lang="pug">
   v-app
     header
-      v-app-bar(
+      v-app-bar.pt-8(
         elevate-on-scroll
         )
         //- v-app-bar-nav-icon(
@@ -42,7 +42,7 @@
         app
         temporary
         )
-        v-list(
+        v-list.mt-8(
           nav
           dense
           )
@@ -77,9 +77,9 @@
               v-list-item-icon
                 v-icon mdi-logout
               v-list-item-title ログアウト
-    v-main
+    v-main.mt-8.mb-4
       router-view
-    v-footer(
+    v-footer.pb-4(
       v-if="store.userId && store.userId.length"
       app
       padless

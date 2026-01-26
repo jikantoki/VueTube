@@ -13,6 +13,8 @@
     "format": "prettier --write \"app/javascript/**/*.{ts,js,vue}\""
   },
   "dependencies": {
+    "@capacitor/android": "^8.0.1",
+    "@capacitor/assets": "^3.0.5",
     "@fontsource/roboto": "5.2.7",
     "@mdi/font": "7.4.47",
     "pinia": "^3.0.4",
@@ -23,6 +25,8 @@
     "vuetify": "^3.10.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.0.1",
+    "@capacitor/core": "^8.0.1",
     "@tsconfig/node22": "^22.0.0",
     "@types/node": "^22.9.0",
     "@vitejs/plugin-vue": "^6.0.3",

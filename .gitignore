@@ -23,3 +23,5 @@ pnpm-debug.log*
 
 .env
 /php/userlist.php
+
+android-keystore.keystore
