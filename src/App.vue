@@ -163,7 +163,11 @@
       document.title = 'VueTube'
       App.addListener('backButton', () => {
         // ここにバックボタンが押されたときの処理を記述
-        if (this.$router.currentRoute.value.path === '/') {
+        if (this.aboutDialog) {
+          this.aboutDialog = false
+        } else if (this.mainDrawer) {
+          this.mainDrawer = false
+        } else if (this.$router.currentRoute.value.path === '/') {
           App.minimizeApp()
         } else {
           this.$router.back()
@@ -172,8 +176,6 @@
     },
     methods: {
       logout () {
-        localStorage.removeItem('userId')
-        localStorage.removeItem('password')
         this.store.userId = ''
         this.store.password = ''
         this.$router.push('/login')

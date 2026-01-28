@@ -138,6 +138,7 @@
 </template>
 
 <script lang="ts">
+  import { App } from '@capacitor/app'
   import { useStore } from '@/stores/store'
 
   interface File {
@@ -222,18 +223,12 @@
       }
 
       // 保存されているログイン情報を取得
-      const userId = localStorage.getItem('userId')
-      const password = localStorage.getItem('password')
+      const userId = this.store.userId
+      const password = this.store.password
 
       if (!userId || !password) {
         this.$router.push('/login')
         return
-      }
-      if (userId) {
-        this.store.userId = userId
-      }
-      if (password) {
-        this.store.password = password
       }
 
       // 保存されているファイル情報を取得
@@ -243,6 +238,21 @@
         this.searchResults = this.store.files
       }
       await this.getData()
+
+      App.addListener('backButton', () => {
+        // ここにバックボタンが押されたときの処理を記述
+        if (this.infoDialog) {
+          this.infoDialog = false
+        } else if (this.errorDialog) {
+          this.errorDialog = false
+        } else if (this.refreshDialog) {
+          this.refreshDialog = false
+        } else if (this.$router.currentRoute.value.path === '/') {
+          App.minimizeApp()
+        } else {
+          this.$router.back()
+        }
+      })
     },
     methods: {
       copy (text: string) {

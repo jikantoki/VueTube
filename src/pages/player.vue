@@ -111,6 +111,7 @@
         ) 閉じる
 </template>
 <script lang="ts">
+  import { App } from '@capacitor/app';
   import { useStore } from '@/stores/store'
 
   export default {
@@ -214,9 +215,23 @@
         // スペースキーで再生・一時停止切り替え
         document.addEventListener('keydown', this.keyInput)
       }, 100)
+
+      App.addListener('backButton', () => {
+        // ここにバックボタンが押されたときの処理を記述
+        if (this.$refs.video) {
+          if (this.isFullscreen) {
+            this.videoFullscreen()
+          } else {
+            this.$router.back()
+          }
+        } else {
+          this.$router.back()
+        }
+      })
     },
     unmounted () {
       document.removeEventListener('keydown', this.keyInput)
+      App.removeAllListeners()
     },
     methods: {
       /** クリップボードにコピー */

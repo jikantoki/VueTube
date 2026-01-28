@@ -31,8 +31,8 @@ foreach ($userList as $user) {
     }
 }
 if (!$isAuthenticated) {
-    echo json_encode(['id' => $id, 'password' => $password]);
-    //http_response_code(403);
+    //echo json_encode(['id' => $id, 'password' => $password]);
+    http_response_code(403);
     exit;
 }
 
