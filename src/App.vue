@@ -77,7 +77,7 @@
               v-list-item-icon
                 v-icon mdi-logout
               v-list-item-title ログアウト
-    v-main.mt-8.mb-4
+    v-main.mt-8.mb-4(style="height: calc(100vh - 32px - 16px);")
       router-view
     v-footer.pb-4(
       v-if="store.userId && store.userId.length"
@@ -173,6 +173,9 @@
           this.$router.back()
         }
       })
+    },
+    unmounted () {
+      App.removeAllListeners()
     },
     methods: {
       logout () {

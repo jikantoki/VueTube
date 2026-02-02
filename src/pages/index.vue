@@ -3,36 +3,34 @@
     v-card-title.my-2(
       style="display: flex; align-items: center;"
       )
-      p ファイル（{{ searchResults.length }}個）
+      p ファイル（{{ store.searchResults.length }}個）
       v-spacer
       v-btn(
         prepend-icon="mdi-shuffle"
         append-icon="mdi-play"
         @click="randomPlay"
         style="background-color: rgb(var(--v-theme-primary)); color: white;"
-        :disabled="searchResults.length === 0"
+        :disabled="store.searchResults.length === 0"
       ) ランダム再生
     v-card-text
       v-text-field(
         label="検索"
         v-model="query"
-        append-icon="mdi-magnify"
+        append-inner-icon="mdi-magnify"
         clearable
         )
       .playbuttons(
-        style="display: flex; margin-bottom: 10px;"
+        style="display: flex; margin-bottom: 10px; width: 100%; gap: 10px; justify-content: center;"
       )
         v-select(
           v-model="selectedSortBy"
           :items="sortByList"
           label="並び替え"
-          style="max-width: 200px; margin-right: 10px;"
         )
         v-select(
           v-model="selectedAscDesc"
           :items="ascDescList"
           label="順序"
-          style="max-width: 200px;"
         )
       .center(
         style="text-align: center;"
@@ -44,11 +42,11 @@
         ) 最新データを取得
       h2.ma-16(
         style="text-align: center;"
-        v-if="searchResults.length === 0"
+        v-if="store.searchResults.length === 0"
       ) 検索結果がありません
       v-list(lines="three")
         v-list-item.list-item(
-          v-for="(file, cnt) in searchResults"
+          v-for="(file, cnt) in store.searchResults"
           :key="file.path"
           @click="$router.push({ path: '/player', query: { file: file.path } })"
           link
@@ -67,6 +65,7 @@
               v-btn(
                 icon="mdi-video-outline"
                 )
+      .ma-16
   v-dialog(
     v-model="infoDialog"
     max-width="500"
@@ -92,7 +91,7 @@
               v-list-item-title ファイルパス
               v-list-item-subtitle(
                 style="white-space: normal; -webkit-line-clamp: unset;"
-              ) {{ infoFile.path }}
+              ) {{ store.server }}{{ infoFile.path }}
           v-list-item
             v-list-item-content
               v-list-item-title ファイルサイズ
@@ -139,6 +138,7 @@
 
 <script lang="ts">
   import { App } from '@capacitor/app'
+  // @ts-ignore
   import { useStore } from '@/stores/store'
 
   interface File {
@@ -160,7 +160,6 @@
         errorDialog: false,
         errorMessage: '',
         query: '',
-        searchResults: [] as File[],
         infoDialog: false,
         infoFile: {} as File,
         sortByList: [
@@ -183,12 +182,12 @@
         handler (newQuery: string) {
           localStorage.setItem('query', newQuery)
           if (!newQuery || newQuery.length === 0) {
-            this.searchResults = this.store.files
+            this.store.searchResults = this.store.files
             return
           }
           const lowerQuery = newQuery.toLowerCase()
           const splitedQuery = lowerQuery.split(' ')
-          this.searchResults = this.store.files.filter((file: File) => {
+          this.store.searchResults = this.store.files.filter((file: File) => {
             const lowerName = file.name.toLowerCase()
             return splitedQuery.every((q: string) => lowerName.includes(q))
           })
@@ -231,13 +230,8 @@
         return
       }
 
-      // 保存されているファイル情報を取得
-      const files = localStorage.getItem('files')
-      if (files) {
-        this.store.files = JSON.parse(files)
-        this.searchResults = this.store.files
-      }
       await this.getData()
+      this.store.searchResults = this.store.files
 
       App.addListener('backButton', () => {
         // ここにバックボタンが押されたときの処理を記述
@@ -254,21 +248,24 @@
         }
       })
     },
+    unmounted () {
+      App.removeAllListeners()
+    },
     methods: {
       copy (text: string) {
         navigator.clipboard.writeText(text)
       },
       randomPlay () {
-        if (this.searchResults.length === 0) {
+        if (this.store.searchResults.length === 0) {
           return
         }
-        const randomIndex = Math.floor(Math.random() * this.searchResults.length)
-        const file = this.searchResults[randomIndex]
+        const randomIndex = Math.floor(Math.random() * this.store.searchResults.length)
+        const file = this.store.searchResults[randomIndex]
         this.$router.push({ path: '/player', query: { file: file?.path } })
       },
       sortResults () {
         const asc = this.selectedAscDesc === '↑'
-        this.searchResults.sort((a: File, b: File) => {
+        this.store.searchResults.sort((a: File, b: File) => {
           let compare = 0
           switch (this.selectedSortBy) {
             case '名前': {
@@ -305,13 +302,8 @@
           }
           const data: ResponseData = await response.json()
 
-          // ログイン成功したので情報を保存
-          localStorage.setItem('userId', this.store.userId)
-          localStorage.setItem('password', this.store.password)
           if (data.files) {
             this.store.files = data.files
-            localStorage.setItem('files', JSON.stringify(this.store.files))
-            // this.searchResults = this.store.files
           }
           if (data.ip) {
             this.store.ipAddress = data.ip

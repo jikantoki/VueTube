@@ -1,6 +1,6 @@
 <template lang="pug">
 .login-page(
-  style="display: flex; justify-content: center; align-items: center; height: 100vh;"
+  style="display: flex; justify-content: center; align-items: center; height: calc(100vh - 32px - 64px);"
 )
   v-card.pa-8(
     width="90%"
@@ -19,7 +19,6 @@
         @keyup.enter="$refs.password.focus()"
         )
       v-text-field(
-        type="password"
         v-model="password"
         placeholder="Password"
         label="パスワード"
@@ -27,6 +26,9 @@
         clearable
         ref="password"
         @keyup.enter="$refs.server.focus()"
+        :append-inner-icon="passwordShow ? 'mdi-eye-off' : 'mdi-eye'"
+        @click:append-inner="passwordShow = !passwordShow"
+        :type="passwordShow ? 'text' : 'password'"
         )
       v-text-field(
         type="text"
@@ -51,6 +53,7 @@
 </template>
 
 <script lang="ts">
+// @ts-ignore
   import { useStore } from '@/stores/store'
 
   export default {
@@ -61,6 +64,7 @@
         server: '',
         errorMessage: '',
         store: useStore(),
+        passwordShow: false,
       }
     },
     mounted () {

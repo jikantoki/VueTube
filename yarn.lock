@@ -129,6 +129,11 @@
   dependencies:
     tslib "^2.1.0"
 
+"@capacitor/share@^8.0.0":
+  version "8.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor/share/-/share-8.0.0.tgz#8f8151bfad8f33804d9fed0f0cca9ee78b02e0c5"
+  integrity sha512-VU+xT4LFwr4keIC0UKDqGQVAiNlAHwoTMQg8wVVSxtn/k32VOvvtqFfu63qnXr40WKytZWrxJfVESvRjd761yg==
+
 "@clack/core@0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@clack/core/-/core-0.5.0.tgz#970df024a927d6af90111667a0384e233b5ffa1a"

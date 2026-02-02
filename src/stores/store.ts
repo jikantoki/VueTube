@@ -27,6 +27,8 @@ export const useStore = defineStore('store', {
       server: '',
       /** ファイル一覧 */
       files: [] as File[],
+      /** 検索結果 */
+      searchResults: [] as File[],
       /** IPアドレス */
       ipAddress: '',
       /** ディスク総容量 */
@@ -37,8 +39,8 @@ export const useStore = defineStore('store', {
       history: {} as Histories,
       /** 検索クエリ */
       query: '',
-      selectedSortBy: '',
-      selectedAscDesc: '',
+      selectedSortBy: '名前',
+      selectedAscDesc: '↑',
     }
   },
   persist: true,
