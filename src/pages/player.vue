@@ -63,7 +63,7 @@
             style="position: absolute; right: 16px; bottom: 12px; color: white; font-size: 14px; pointer-events: none;"
           ) {{ Math.floor(currentTime / 60) }}:{{ ('0' + Math.floor(currentTime % 60)).slice(-2) }} / {{ Math.floor(duration / 60) }}:{{ ('0' + Math.floor(duration % 60)).slice(-2) }}
     v-card(
-      style="overflow-y: auto; height: -webkit-full-available;"
+      style="overflow-y: auto; height: -webkit-fill-available; height: -moz-fill-available;"
     )
       v-card-title(
         style="font-size: 24px; font-weight: bold;"
@@ -134,7 +134,7 @@
             v-list-item-content
               v-list-item-title ファイル名
               v-list-item-subtitle(
-                style="white-space: normal; -webkit-line-clamp: unset;"
+                style="white-space: normal; -webkit-line-clamp: unset; -moz-line-clamp: unset;"
               ) {{ infoFile.name }}
               v-list-item-action
                 v-btn.my-2(
@@ -146,7 +146,7 @@
             v-list-item-content
               v-list-item-title ファイルパス
               v-list-item-subtitle(
-                style="white-space: normal; -webkit-line-clamp: unset;"
+                style="white-space: normal; -webkit-line-clamp: unset; -moz-line-clamp: unset;"
               ) {{ store.server }}{{ infoFile.path }}
           v-list-item
             v-list-item-content

@@ -78,7 +78,7 @@
             v-list-item-content
               v-list-item-title ファイル名
               v-list-item-subtitle(
-                style="white-space: normal; -webkit-line-clamp: unset;"
+                style="white-space: normal; -webkit-line-clamp: unset; -moz-line-clamp: unset;"
               ) {{ infoFile.name }}
               v-list-item-action
                 v-btn.my-2(
@@ -90,7 +90,7 @@
             v-list-item-content
               v-list-item-title ファイルパス
               v-list-item-subtitle(
-                style="white-space: normal; -webkit-line-clamp: unset;"
+                style="white-space: normal; -webkit-line-clamp: unset; -moz-line-clamp: unset;"
               ) {{ store.server }}{{ infoFile.path }}
           v-list-item
             v-list-item-content
