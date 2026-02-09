@@ -15,7 +15,7 @@
         @click="showControls = !showControls"
         )
         source(
-          :src="`${this.store.server}/${playing.path}`"
+          :src="`${this.store.server}${playing.path}`"
           type="video/mp4"
           )
       .controls(
@@ -148,6 +148,12 @@
               v-list-item-subtitle(
                 style="white-space: normal; -webkit-line-clamp: unset; -moz-line-clamp: unset;"
               ) {{ store.server }}{{ infoFile.path }}
+              v-list-item-action
+                v-btn.my-2(
+                  prepend-icon="mdi-content-copy"
+                  style="background-color: rgb(var(--v-theme-primary)); color: white;"
+                  @click="copy(`${store.server}${infoFile.path}`)"
+                  ) パスをコピー
           v-list-item
             v-list-item-content
               v-list-item-title ファイルサイズ
@@ -301,7 +307,7 @@
       /** ファイルをダウンロード */
       download (filePath: string) {
         const link = document.createElement('a')
-        link.href = `${this.store.server}/${filePath}`
+        link.href = `${this.store.server}${filePath}`
         link.download = ''
         link.target = '_blank'
         document.body.append(link)
