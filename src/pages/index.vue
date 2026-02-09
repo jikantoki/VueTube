@@ -108,7 +108,13 @@
   )
     v-card
       v-card-title 認証エラー
-      v-card-text {{ errorMessage }}
+      v-card-text
+        a(
+          :href="`${this.store.server}/main.php`"
+          target="_blank"
+          style="color: inherit;"
+        ) {{ `${this.store.server}/main.php` }}
+        p {{ errorMessage }}
       v-card-actions
         v-spacer
         v-btn(
@@ -300,7 +306,8 @@
           if (response.status !== 200) {
             throw new Error(`HTTPステータス${response.status}: ログインに失敗しました。IDまたはパスワードを確認してください。サーバーが圏外の可能性もあります`)
           }
-          const data: ResponseData = await response.json()
+          const textData = await response.text()
+          const data: ResponseData = JSON.parse(textData)
 
           if (data.files) {
             this.store.files = data.files

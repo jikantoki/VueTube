@@ -7,12 +7,17 @@ header('Content-Type: application/json; charset=utf-8');
 
 // ブラウザが送る事前確認（プリフライト）への応答
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') {
-    http_response_code(200);
+    http_response_code(204);
     exit;
 }
 
 if (!isset($_SERVER['HTTP_ID']) || !isset($_SERVER['HTTP_PASSWORD'])) {
     http_response_code(401);
+    echo json_encode(
+        [
+            'status' => 'login shitekure'
+        ]
+    );
     exit;
 }
 
@@ -21,21 +26,29 @@ $password = $_SERVER['HTTP_PASSWORD'];
 
 require_once __DIR__ . '/userlist.php';
 
-$isAuthenticated = false;
+$auth = false;
 // IDとパスワードの確認
 foreach ($userList as $user) {
     if ($id === $user['userId'] && $password === $user['password']) {
         // 認証成功
-        $isAuthenticated = true;
+        $auth = true;
         break;
     }
 }
-if (!$isAuthenticated) {
-    //echo json_encode(['id' => $id, 'password' => $password]);
+
+if ($auth !== true) {
     http_response_code(403);
+    echo json_encode(
+        [
+            'status' => 'Invalid Account',
+            'id' => $id,
+            'password' => $password
+        ]
+    );
     exit;
 }
 
+http_response_code(200);
 $directoryRoot = $_SERVER['DOCUMENT_ROOT'];
 /** 表示対象のディレクトリパス */
 $directoryPath = "/hoge";
@@ -65,3 +78,4 @@ echo json_encode(
         'ip' => $ip
     ]
 );
+exit;
