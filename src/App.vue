@@ -125,6 +125,7 @@
 
 <script lang="ts">
   import { App } from '@capacitor/app'
+  import type { PluginListenerHandle } from '@capacitor/core'
   import { useStore } from './stores/store'
   export default {
     name: 'App',
@@ -133,6 +134,7 @@
         store: useStore(),
         mainDrawer: false,
         aboutDialog: false,
+        backButtonListener: null as PluginListenerHandle | null,
       }
     },
     computed: {
@@ -159,10 +161,16 @@
         return (this.usedBytes / this.store.totalBytes) * 100
       },
     },
-    mounted () {
+    async mounted () {
       document.title = 'VueTube'
-      App.addListener('backButton', () => {
-        // ここにバックボタンが押されたときの処理を記述
+      this.backButtonListener = await App.addListener('backButton', () => {
+        // ページ固有のバックボタン処理があればそれを実行
+        if (this.store.customBackHandler && this.store.customBackHandler()) {
+          // カスタムハンドラーがtrueを返した場合は処理済み
+          return
+        }
+
+        // App.vue固有の処理
         if (this.aboutDialog) {
           this.aboutDialog = false
         } else if (this.mainDrawer) {
@@ -175,7 +183,9 @@
       })
     },
     unmounted () {
-      App.removeAllListeners()
+      if (this.backButtonListener) {
+        this.backButtonListener.remove()
+      }
     },
     methods: {
       logout () {

@@ -41,6 +41,8 @@ export const useStore = defineStore('store', {
       query: '',
       selectedSortBy: '名前',
       selectedAscDesc: '↑',
+      /** カスタムバックボタンハンドラー（ページ固有の処理用） */
+      customBackHandler: null as (() => boolean) | null,
     }
   },
   persist: true,
