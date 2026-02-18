@@ -166,7 +166,6 @@
         ) 閉じる
 </template>
 <script lang="ts">
-  import { App } from '@capacitor/app'
   import { Share } from '@capacitor/share'
   // @ts-ignore
   import { useStore } from '@/stores/store'
@@ -274,22 +273,22 @@
         document.addEventListener('keydown', this.keyInput)
       }, 100)
 
-      App.addListener('backButton', () => {
-        // ここにバックボタンが押されたときの処理を記述
-        if (this.$refs.video) {
-          if (this.isFullscreen) {
-            this.videoFullscreen()
-          } else {
-            this.$router.back()
-          }
-        } else {
-          this.$router.back()
+      // カスタムバックボタンハンドラーを登録
+      this.store.customBackHandler = () => {
+        if (this.isFullscreen) {
+          this.videoFullscreen()
+          return true
+        } else if (this.infoDialog) {
+          this.infoDialog = false
+          return true
         }
-      })
+        return false
+      }
     },
     unmounted () {
       document.removeEventListener('keydown', this.keyInput)
-      App.removeAllListeners()
+      // カスタムハンドラーをクリア
+      this.store.customBackHandler = null
     },
     methods: {
       /** 共有 */

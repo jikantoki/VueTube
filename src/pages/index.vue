@@ -143,7 +143,6 @@
 </template>
 
 <script lang="ts">
-  import { App } from '@capacitor/app'
   // @ts-ignore
   import { useStore } from '@/stores/store'
 
@@ -239,23 +238,24 @@
       await this.getData()
       this.store.searchResults = this.store.files
 
-      App.addListener('backButton', () => {
-        // ここにバックボタンが押されたときの処理を記述
+      // カスタムバックボタンハンドラーを登録
+      this.store.customBackHandler = () => {
         if (this.infoDialog) {
           this.infoDialog = false
+          return true
         } else if (this.errorDialog) {
           this.errorDialog = false
+          return true
         } else if (this.refreshDialog) {
           this.refreshDialog = false
-        } else if (this.$router.currentRoute.value.path === '/') {
-          App.minimizeApp()
-        } else {
-          this.$router.back()
+          return true
         }
-      })
+        return false
+      }
     },
     unmounted () {
-      App.removeAllListeners()
+      // カスタムハンドラーをクリア
+      this.store.customBackHandler = null
     },
     methods: {
       copy (text: string) {
