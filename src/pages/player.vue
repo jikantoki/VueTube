@@ -472,7 +472,7 @@
           if (response.ok) {
             console.log('サムネイル画像が見つかりました:', thumbnailUrl)
           }
-        } catch (error) {
+        } catch {
           console.log('サムネイル画像が見つかりませんでした:', filePath)
         }
       },

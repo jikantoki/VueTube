@@ -41,8 +41,7 @@ if ($auth !== true) {
     echo json_encode(
         [
             'status' => 'Invalid Account',
-            'id' => $id,
-            'password' => $password
+            'id' => $id
         ]
     );
     exit;

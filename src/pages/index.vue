@@ -265,7 +265,7 @@
 
       await this.getData()
       this.store.searchResults = this.store.files
-      
+
       // サムネイルを読み込む
       await this.loadThumbnails()
 
@@ -374,11 +374,11 @@
             throw new Error(`HTTPステータス${response.status}: サムネイル生成に失敗しました`)
           }
           const data = await response.json()
-          
+
           console.log('サムネイル生成完了:', data)
           this.snackbarMessage = `サムネイルを${data.generated}個生成しました`
           this.snackbar = true
-          
+
           // サムネイルを再読み込み
           await this.loadThumbnails()
         } catch (error) {
@@ -390,18 +390,19 @@
         }
       },
       async loadThumbnails () {
-        // 全てのファイルのサムネイルを読み込む
-        for (const file of this.store.files) {
+        // 全てのファイルのサムネイルを並列で読み込む
+        const promises = this.store.files.map(async (file) => {
           const thumbnailUrl = `${this.store.server}${file.path}.jpg`
           try {
             const response = await fetch(thumbnailUrl, { method: 'HEAD' })
             if (response.ok) {
               this.thumbnails[file.path] = thumbnailUrl
             }
-          } catch (error) {
+          } catch {
             // サムネイルが存在しない場合は無視
           }
-        }
+        })
+        await Promise.all(promises)
       },
     },
   }
