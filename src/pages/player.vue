@@ -226,6 +226,8 @@
       const playingFile = this.store.files.find(file => file.path === filePath)
       if (playingFile) {
         this.playing = playingFile
+        // 動画を開いたときに自動的にサムネイルを取得
+        this.fetchThumbnail(playingFile.path)
       }
 
       setTimeout(() => {
@@ -462,6 +464,17 @@
         this.$refs.video.src = `${this.store.server}${file.path}`
         this.currentPath = `${this.store.server}${file.path}`
         this.playing = file
+      },
+      async fetchThumbnail (filePath: string) {
+        const thumbnailUrl = `${this.store.server}${filePath}.jpg`
+        try {
+          const response = await fetch(thumbnailUrl, { method: 'HEAD' })
+          if (response.ok) {
+            console.log('サムネイル画像が見つかりました:', thumbnailUrl)
+          }
+        } catch (error) {
+          console.log('サムネイル画像が見つかりませんでした:', filePath)
+        }
       },
     },
   }
