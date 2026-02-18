@@ -61,10 +61,10 @@
             v-list-item-title {{ file.name }}
             v-list-item-subtitle {{ (file.size / 1024 / 1024).toFixed(2) }} MB
             img.thumbnail(
-              v-if="thumbnails[file.path]"
+              v-if="thumbnails[file.path] && !thumbnailErrors[file.path]"
               :src="thumbnails[file.path]"
               style="width: 100%; aspect-ratio: 16/9; object-fit: cover; margin-top: 8px; border-radius: 4px;"
-              @error="thumbnails[file.path] = null"
+              @error="thumbnailErrors[file.path] = true"
             )
           template(v-slot:append)
             v-btn(
@@ -206,6 +206,7 @@
         refreshDialog: false,
         thumbnailGenerating: false,
         thumbnails: {} as Record<string, string | null>,
+        thumbnailErrors: {} as Record<string, boolean>,
         snackbar: false,
         snackbarMessage: '',
       }

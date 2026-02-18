@@ -40,8 +40,7 @@ if ($auth !== true) {
     http_response_code(403);
     echo json_encode(
         [
-            'status' => 'Invalid Account',
-            'id' => $id
+            'status' => 'Invalid Account'
         ]
     );
     exit;
