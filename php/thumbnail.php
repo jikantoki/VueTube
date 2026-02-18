@@ -63,7 +63,10 @@ foreach ($files as $file) {
     }
     
     // 動画の長さを取得
-    $command = "ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 " . escapeshellarg($file);
+    $command = sprintf(
+        'ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 %s',
+        escapeshellarg($file)
+    );
     $duration = trim(shell_exec($command));
     
     if (empty($duration) || !is_numeric($duration)) {
@@ -74,8 +77,19 @@ foreach ($files as $file) {
     // 80%の位置を計算
     $timestamp = floatval($duration) * 0.8;
     
+    // タイムスタンプの妥当性チェック
+    if ($timestamp < 0) {
+        $errors[] = "Invalid timestamp for: " . basename($file);
+        continue;
+    }
+    
     // ffmpegでサムネイルを生成
-    $ffmpegCommand = "ffmpeg -ss " . escapeshellarg($timestamp) . " -i " . escapeshellarg($file) . " -vframes 1 -q:v 2 " . escapeshellarg($thumbnailPath) . " 2>&1";
+    $ffmpegCommand = sprintf(
+        'ffmpeg -ss %s -i %s -vframes 1 -q:v 2 %s 2>&1',
+        escapeshellarg($timestamp),
+        escapeshellarg($file),
+        escapeshellarg($thumbnailPath)
+    );
     $output = shell_exec($ffmpegCommand);
     
     if (file_exists($thumbnailPath)) {

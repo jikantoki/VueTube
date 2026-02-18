@@ -64,7 +64,7 @@
               v-if="thumbnails[file.path] && !thumbnailErrors[file.path]"
               :src="thumbnails[file.path]"
               style="width: 100%; aspect-ratio: 16/9; object-fit: cover; margin-top: 8px; border-radius: 4px;"
-              @error="thumbnailErrors[file.path] = true"
+              @error="() => { delete thumbnails[file.path]; thumbnailErrors[file.path] = true }"
             )
           template(v-slot:append)
             v-btn(
