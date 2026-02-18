@@ -4,6 +4,14 @@
 
 ![icon](./public/icon192.png)
 
+## テスト用ログイン情報
+
+- ID: test
+- Password: test
+- 接続先サーバー: https://mikel.enoki.xyz
+
+でログインするとミュージックビデオが7本くらい入っているサーバーに接続してテストできる
+
 ## htaccess
 
 ```htaccess
