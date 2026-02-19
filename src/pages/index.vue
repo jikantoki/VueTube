@@ -145,7 +145,7 @@
       v-card-text(
         style="text-align: center;"
         )
-          p 見つかったファイル数: {{ searchResults.length }}個
+          p 見つかったファイル数: {{ searchResults?.length }}個
       v-card-actions
         v-spacer
         v-btn(
@@ -392,7 +392,7 @@
       },
       async loadThumbnails () {
         // 全てのファイルのサムネイルを並列で読み込む
-        const promises = this.store.files.map(async (file) => {
+        const promises = this.store.files.map(async (file: File) => {
           const thumbnailUrl = `${this.store.server}${file.path}.jpg`
           try {
             const response = await fetch(thumbnailUrl, { method: 'HEAD' })
