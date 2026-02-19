@@ -342,6 +342,10 @@
 
           if (data.files) {
             this.store.files = data.files
+            // 検索結果も更新
+            this.store.searchResults = data.files
+            // サムネイルを再読み込み
+            await this.loadThumbnails()
           }
           if (data.ip) {
             this.store.ipAddress = data.ip
@@ -394,14 +398,18 @@
         // 全てのファイルのサムネイルを並列で読み込む
         const promises = this.store.files.map(async (file: File) => {
           const thumbnailUrl = `${this.store.server}${file.path}.jpg`
-          try {
-            const response = await fetch(thumbnailUrl, { method: 'HEAD' })
-            if (response.ok) {
+          return new Promise<void>(resolve => {
+            const img = new Image()
+            img.addEventListener('load', () => {
               this.thumbnails[file.path] = thumbnailUrl
-            }
-          } catch {
-            // サムネイルが存在しない場合は無視
-          }
+              resolve()
+            })
+            img.addEventListener('error', () => {
+              // サムネイルが存在しない場合は静かに無視（コンソールエラーを出さない）
+              resolve()
+            })
+            img.src = thumbnailUrl
+          })
         })
         await Promise.all(promises)
       },
