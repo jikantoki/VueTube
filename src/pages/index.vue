@@ -61,10 +61,9 @@
             v-list-item-title {{ file.name }}
             v-list-item-subtitle {{ (file.size / 1024 / 1024).toFixed(2) }} MB
             img.thumbnail(
-              v-if="thumbnails[file.path] && !thumbnailErrors[file.path]"
-              :src="thumbnails[file.path]"
+              :src="`${store.server}${file.path}.jpg`"
               style="width: 100%; aspect-ratio: 16/9; object-fit: cover; margin-top: 8px; border-radius: 4px;"
-              @error="() => { delete thumbnails[file.path]; thumbnailErrors[file.path] = true }"
+              onerror="this.src = '/thumbnail.jpg'"
             )
           template(v-slot:append)
             v-btn(
@@ -145,7 +144,7 @@
       v-card-text(
         style="text-align: center;"
         )
-          p 見つかったファイル数: {{ searchResults?.length }}個
+          p 見つかったファイル数: {{ store.searchResults.length }}個
       v-card-actions
         v-spacer
         v-btn(
@@ -267,9 +266,6 @@
       await this.getData()
       this.store.searchResults = this.store.files
 
-      // サムネイルを読み込む
-      await this.loadThumbnails()
-
       App.addListener('backButton', () => {
         // ここにバックボタンが押されたときの処理を記述
         if (this.infoDialog) {
@@ -344,8 +340,6 @@
             this.store.files = data.files
             // 検索結果も更新
             this.store.searchResults = data.files
-            // サムネイルを再読み込み
-            await this.loadThumbnails()
           }
           if (data.ip) {
             this.store.ipAddress = data.ip
@@ -383,9 +377,6 @@
           console.log('サムネイル生成完了:', data)
           this.snackbarMessage = `サムネイルを${data.generated}個生成しました`
           this.snackbar = true
-
-          // サムネイルを再読み込み
-          await this.loadThumbnails()
         } catch (error) {
           console.error('サムネイル生成エラー:', error)
           this.snackbarMessage = 'サムネイル生成に失敗しました'
@@ -393,25 +384,6 @@
         } finally {
           this.thumbnailGenerating = false
         }
-      },
-      async loadThumbnails () {
-        // 全てのファイルのサムネイルを並列で読み込む
-        const promises = this.store.files.map(async (file: File) => {
-          const thumbnailUrl = `${this.store.server}${file.path}.jpg`
-          return new Promise<void>(resolve => {
-            const img = new Image()
-            img.addEventListener('load', () => {
-              this.thumbnails[file.path] = thumbnailUrl
-              resolve()
-            })
-            img.addEventListener('error', () => {
-              // サムネイルが存在しない場合は静かに無視（コンソールエラーを出さない）
-              resolve()
-            })
-            img.src = thumbnailUrl
-          })
-        })
-        await Promise.all(promises)
       },
     },
   }
@@ -423,6 +395,14 @@
     &:hover {
       background-color: rgba(var(--v-theme-primary), 0.2);
       cursor: pointer;
+    }
+  }
+  v-list-item-content {
+    width: 100%;
+    img.thumbnail {
+      aspect-ratio: 16/9;
+      width: 100%;
+      object-fit: cover;
     }
   }
 </style>
