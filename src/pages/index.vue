@@ -33,13 +33,19 @@
           label="順序"
         )
       .center(
-        style="text-align: center;"
+        style="text-align: center; display: flex; gap: 10px; justify-content: center;"
       )
         v-btn(
           append-icon="mdi-refresh"
           style="background-color: rgb(var(--v-theme-primary)); color: white;"
           @click="getData(true)"
         ) 最新データを取得
+        v-btn(
+          prepend-icon="mdi-image"
+          style="background-color: rgb(var(--v-theme-primary)); color: white;"
+          @click="generateThumbnails"
+          :loading="thumbnailGenerating"
+        ) サムネイル取得
       h2.ma-16(
         style="text-align: center;"
         v-if="store.searchResults.length === 0"
@@ -54,6 +60,11 @@
           v-list-item-content
             v-list-item-title {{ file.name }}
             v-list-item-subtitle {{ (file.size / 1024 / 1024).toFixed(2) }} MB
+            img.thumbnail(
+              :src="`${store.server}${file.path}.jpg`"
+              style="width: 100%; aspect-ratio: 16/9; object-fit: cover; margin-top: 8px; border-radius: 4px;"
+              onerror="this.src = '/thumbnail.jpg'"
+            )
           template(v-slot:append)
             v-btn(
               icon
@@ -133,13 +144,24 @@
       v-card-text(
         style="text-align: center;"
         )
-          p 見つかったファイル数: {{ searchResults.length }}個
+          p 見つかったファイル数: {{ store.searchResults.length }}個
       v-card-actions
         v-spacer
         v-btn(
           @click="refreshDialog = false"
           style="background-color: rgb(var(--v-theme-primary)); color: white;"
         ) 閉じる
+  v-snackbar(
+    v-model="snackbar"
+    :timeout="3000"
+    color="primary"
+  )
+    | {{ snackbarMessage }}
+    template(v-slot:actions)
+      v-btn(
+        variant="text"
+        @click="snackbar = false"
+      ) 閉じる
 </template>
 
 <script lang="ts">
@@ -181,6 +203,11 @@
         ],
         selectedAscDesc: '↑',
         refreshDialog: false,
+        thumbnailGenerating: false,
+        thumbnails: {} as Record<string, string | null>,
+        thumbnailErrors: {} as Record<string, boolean>,
+        snackbar: false,
+        snackbarMessage: '',
       }
     },
     watch: {
@@ -311,6 +338,8 @@
 
           if (data.files) {
             this.store.files = data.files
+            // 検索結果も更新
+            this.store.searchResults = data.files
           }
           if (data.ip) {
             this.store.ipAddress = data.ip
@@ -330,6 +359,32 @@
           console.error(error)
         }
       },
+      async generateThumbnails () {
+        this.thumbnailGenerating = true
+        try {
+          const response = await fetch(`${this.store.server}/thumbnail.php`, {
+            method: 'POST',
+            headers: {
+              id: this.store.userId,
+              password: this.store.password,
+            },
+          })
+          if (response.status !== 200) {
+            throw new Error(`HTTPステータス${response.status}: サムネイル生成に失敗しました`)
+          }
+          const data = await response.json()
+
+          console.log('サムネイル生成完了:', data)
+          this.snackbarMessage = `サムネイルを${data.generated}個生成しました`
+          this.snackbar = true
+        } catch (error) {
+          console.error('サムネイル生成エラー:', error)
+          this.snackbarMessage = 'サムネイル生成に失敗しました'
+          this.snackbar = true
+        } finally {
+          this.thumbnailGenerating = false
+        }
+      },
     },
   }
 </script>
@@ -340,6 +395,14 @@
     &:hover {
       background-color: rgba(var(--v-theme-primary), 0.2);
       cursor: pointer;
+    }
+  }
+  v-list-item-content {
+    width: 100%;
+    img.thumbnail {
+      aspect-ratio: 16/9;
+      width: 100%;
+      object-fit: cover;
     }
   }
 </style>
